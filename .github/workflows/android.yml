@@ -1,0 +1,37 @@
+
+name: Build NEXUS CRM Professional
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extract Professional Project
+        run: |
+          unzip -o NEXUS_CRM_Professional_v2.zip -d extracted
+
+      - name: Build Android APK
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Compile APK
+        run: gradle -p extracted/android :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEXUS-CRM-PROFESSIONAL
+          path: extracted/android/app/build/outputs/apk/debug/app-debug.apk
